@@ -5,7 +5,7 @@
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="ytxkbaWUz_GBkNSJb9Mm-1" value="" style="whiteSpace=wrap;html=1;aspect=fixed;horizontal=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="1" vertex="1">
-          <mxGeometry x="70" y="-250" width="960" height="960" as="geometry" />
+          <mxGeometry x="71" y="-260" width="960" height="960" as="geometry" />
         </mxCell>
         <mxCell id="ytxkbaWUz_GBkNSJb9Mm-2" value="Prix Goncourt 2024" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="90" y="-215" width="190" height="40" as="geometry" />
@@ -37,7 +37,7 @@
             <mxPoint x="60" y="530" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ytxkbaWUz_GBkNSJb9Mm-22" value="Vote for the books of the 2nd and 3rd selections and the laureat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+        <mxCell id="ytxkbaWUz_GBkNSJb9Mm-22" value="Vote for the books of the 2nd and 3rd selections" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="610" y="370" width="136" height="100" as="geometry" />
         </mxCell>
         <mxCell id="ytxkbaWUz_GBkNSJb9Mm-24" value="" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=1;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" source="ytxkbaWUz_GBkNSJb9Mm-12" target="ytxkbaWUz_GBkNSJb9Mm-22" edge="1">
