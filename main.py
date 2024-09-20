@@ -1,114 +1,175 @@
 from database import session
 from models import Author, Book, Selection, Jury, Vote, Publisher
 
-def afficher_livres_par_selection(selection_type):
-    try:
-        livres = session.query(Book).join(Selection, Book.id == Selection.id).filter(Selection.type == selection_type).all()
-        if livres:
-            for livre in livres:
-                auteur = session.query(Author).filter(Author.id == livre.author_id).first()
-                editeur = session.query(Publisher).filter(Publisher.id == livre.publisher_id).first()
-                print(f"Titre: {livre.title}\nRésumé: {livre.summary}\nAuteur: {auteur.name if auteur else 'Auteur non trouvé'}\nÉditeur: {editeur.name if editeur else 'Éditeur non trouvé'}\nDate de parution: {livre.publication_date}\nNombre de pages: {livre.pages}\nISBN: {livre.isbn}\nPrix éditeur: {livre.publisher_price}\n")
-        else:
-            print(f"Aucun livre trouvé pour la sélection {selection_type}.")
-    except Exception as e:
-        print(f"Erreur lors de l'affichage des livres : {e}")
+def display_books_by_selection(selection_type):
+    """
+    Affiche les livres en fonction du type de sélection.
 
-def ajouter_livre_a_selection(livre_id, selection_type):
+    Args:
+        selection_type (str): Le type de sélection des livres à afficher.
+
+    Returns:
+        None
+    """
     try:
-        selection = Selection(date='2024-09-19', type=selection_type)  # Exemple de date, à ajuster
+        books = session.query(Book).join(Selection, Book.id == Selection.id).filter(Selection.type == selection_type).all()
+        if books:
+            for book in books:
+                author = session.query(Author).filter(Author.id == book.author_id).first()
+                publisher = session.query(Publisher).filter(Publisher.id == book.publisher_id).first()
+                print(f"Title: {book.title}\nSummary: {book.summary}\nAuthor: {author.name if author else 'Author not found'}\nPublisher: {publisher.name if publisher else 'Publisher not found'}\nPublication Date: {book.publication_date}\nPages: {book.pages}\nISBN: {book.isbn}\nPublisher Price: {book.publisher_price}\n")
+        else:
+            print(f"No books found for the selection {selection_type}.")
+    except Exception as e:
+        print(f"Error displaying books: {e}")
+
+def add_book_to_selection(book_id, selection_type):
+    """
+    Ajoute un livre à une sélection.
+
+    Args:
+        book_id (int): L'ID du livre à ajouter.
+        selection_type (str): Le type de sélection auquel ajouter le livre.
+
+    Returns:
+        None
+    """
+    try:
+        if selection_type == 'First':
+            date = '2024-09-19'
+        elif selection_type == 'Second':
+            date = '2024-10-01'
+        elif selection_type == 'Third':
+            date = '2024-10-22'
+        else:
+            print(f"Type of selection {selection_type} Not recognized.")
+            return
+
+        selection = Selection(date=date, type=selection_type)
         session.add(selection)
         session.commit()
-        print(f"Livre ID {livre_id} ajouté à la sélection {selection_type}.")
+        print(f"Book ID {book_id} added to the selection {selection_type}.")
     except Exception as e:
-        print(f"Erreur lors de l'ajout du livre à la sélection : {e}")
+        print(f"Error adding book to selection: {e}")
 
-def afficher_votes():
+def display_votes():
+    """
+    Affiche tous les votes enregistrés.
+
+    Returns:
+        None
+    """
     try:
         votes = session.query(Vote).all()
         if votes:
             for vote in votes:
-                livre = session.query(Book).filter(Book.id == vote.book_id).first()
-                print(f"Livre: {livre.title if livre else 'Livre non trouvé'}, Votes: {vote.votes}")
+                book = session.query(Book).filter(Book.id == vote.book_id).first()
+                print(f"Book: {book.title if book else 'Book not found'}, Votes: {vote.votes}")
         else:
-            print("Aucun vote trouvé.")
+            print("No votes found.")
     except Exception as e:
-        print(f"Erreur lors de l'affichage des votes : {e}")
+        print(f"Error displaying votes: {e}")
 
-def authentifier_membre(nom, role):
+def authenticate_member(name, role):
+    """
+    Authentifie un membre du jury.
+
+    Args:
+        name (str): Le nom du membre du jury.
+        role (str): Le rôle du membre du jury.
+
+    Returns:
+        Jury: L'objet membre du jury si authentifié, sinon None.
+    """
     try:
-        membre = session.query(Jury).filter(Jury.name == nom, Jury.role == role).first()
-        if membre:
-            print(f"Authentification réussie pour {nom} avec le rôle {role}.")
-            return membre
+        member = session.query(Jury).filter(Jury.name == name, Jury.role == role).first()
+        if member:
+            print(f"Authentication successful for {name} with role {role}.")
+            return member
         else:
-            print("Authentification échouée.")
+            print("Authentication failed.")
             return None
     except Exception as e:
-        print(f"Erreur lors de l'authentification : {e}")
+        print(f"Error during authentication: {e}")
         return None
 
-def voter(membre_id, livre_id):
+def vote(member_id, book_id):
+    """
+    Enregistre un vote pour un livre par un membre du jury.
+
+    Args:
+        member_id (int): L'ID du membre du jury.
+        book_id (int): L'ID du livre pour lequel voter.
+
+    Returns:
+        None
+    """
     try:
-        vote = session.query(Vote).filter(Vote.book_id == livre_id, Vote.jury_member_id == membre_id).first()
+        vote = session.query(Vote).filter(Vote.book_id == book_id, Vote.jury_member_id == member_id).first()
         if vote:
             vote.votes += 1
         else:
-            vote = Vote(book_id=livre_id, jury_member_id=membre_id, votes=1)
+            vote = Vote(book_id=book_id, jury_member_id=member_id, votes=1)
             session.add(vote)
         session.commit()
-        print(f"Vote enregistré pour le livre ID {livre_id} par le membre ID {membre_id}.")
+        print(f"Vote recorded for book ID {book_id} by member ID {member_id}.")
     except Exception as e:
-        print(f"Erreur lors de l'enregistrement du vote : {e}")
+        print(f"Error recording vote: {e}")
 
-def menu_principal():
+def main_menu():
+    """
+    Affiche le menu principal et gère les interactions utilisateur.
+
+    Returns:
+        None
+    """
     while True:
-        print("Bienvenue au Prix Goncourt 2024")
-        print("1. Utilisateur")
-        print("2. Président du jury")
-        print("3. Membre du jury")
-        print("4. Quitter")
-        choix = input("Veuillez sélectionner votre rôle (1/2/3/4) : ")
+        print("Welcome to the Prix Goncourt 2024")
+        print("1. User")
+        print("2. Jury Chairman")
+        print("3. Jury Member")
+        print("4. Quit")
+        choice = input("Please select your role (1/2/3/4): ")
 
-        if choix == '1':
-            print("Vous avez choisi : Utilisateur")
-            selection_type = input("Veuillez entrer le type de sélection à afficher (First/Second/Third) : ")
-            afficher_livres_par_selection(selection_type)
-        elif choix == '2':
-            print("Vous avez choisi : Président du jury")
-            nom = input("Veuillez entrer votre nom : ")
-            role = 'President'  # Utilisation du rôle 'President'
-            membre = authentifier_membre(nom, role)
-            if membre:
-                action = input("Que voulez-vous faire ? (afficher_livres/ajouter_livre/afficher_votes) : ")
-                if action == 'afficher_livres':
-                    selection_type = input("Veuillez entrer le type de sélection à afficher (First/Second/Third) : ")
-                    afficher_livres_par_selection(selection_type)
-                elif action == 'ajouter_livre':
-                    livre_id = int(input("Veuillez entrer l'ID du livre à ajouter : "))
-                    selection_type = input("Veuillez entrer le type de sélection (First/Second/Third) : ")
-                    ajouter_livre_a_selection(livre_id, selection_type)
-                elif action == 'afficher_votes':
-                    afficher_votes()
+        if choice == '1':
+            print("You chose: User")
+            selection_type = input("Please enter the type of selection to display (First/Second/Third): ")
+            display_books_by_selection(selection_type)
+        elif choice == '2':
+            print("You chose: Jury President")
+            name = input("Please enter your name: ")
+            role = 'President'  # Using the role 'President'
+            member = authenticate_member(name, role)
+            if member:
+                action = input("What would you like to do? (display_books/add_book/display_votes): ")
+                if action == 'display_books':
+                    selection_type = input("Please enter the type of selection to display (First/Second/Third): ")
+                    display_books_by_selection(selection_type)
+                elif action == 'add_book':
+                    book_id = int(input("Please enter the ID of the book to add: "))
+                    selection_type = input("Please enter the type of selection (First/Second/Third): ")
+                    add_book_to_selection(book_id, selection_type)
+                elif action == 'display_votes':
+                    display_votes()
                 else:
-                    print("Action non reconnue.")
+                    print("Unrecognized action.")
             else:
-                print("Authentification échouée.")
-        elif choix == '3':
-            print("Vous avez choisi : Membre du jury")
-            nom = input("Veuillez entrer votre nom : ")
+                print("Authentication failed.")
+        elif choice == '3':
+            print("You chose: Jury Member")
+            name = input("Please enter your name: ")
             role = 'Member'
-            membre = authentifier_membre(nom, role)
-            if membre:
-                livre_id = int(input("Veuillez entrer l'ID du livre pour lequel vous voulez voter : "))
-                voter(membre.id, livre_id)
+            member = authenticate_member(name, role)
+            if member:
+                book_id = int(input("Please enter the ID of the book you want to vote for: "))
+                vote(member.id, book_id)
             else:
-                print("Authentification échouée.")
-        elif choix == '4':
-            print("Merci d'avoir utilisé le système. Au revoir !")
+                print("Authentication failed.")
+        elif choice == '4':
+            print("Thank you for using the system. Goodbye!")
             break
         else:
-            print("Choix non valide. Veuillez réessayer.")
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
-    menu_principal()
+    main_menu()
